@@ -416,6 +416,7 @@ static void __init omap_hwmod_init_postsetup(void)
 	/* Set the default postsetup state for all hwmods */
 #ifdef CONFIG_PM
 	postsetup_state = _HWMOD_STATE_IDLE;
+	postsetup_state = _HWMOD_STATE_ENABLED;
 #else
 	postsetup_state = _HWMOD_STATE_ENABLED;
 #endif

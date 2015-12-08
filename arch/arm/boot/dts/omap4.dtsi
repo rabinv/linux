@@ -31,7 +31,7 @@
 		#address-cells = <1>;
 		#size-cells = <0>;
 
-		cpu@0 {
+		CPU0: cpu@0 {
 			compatible = "arm,cortex-a9";
 			device_type = "cpu";
 			next-level-cache = <&L2>;
@@ -42,7 +42,7 @@
 
 			clock-latency = <300000>; /* From omap-cpufreq driver */
 		};
-		cpu@1 {
+		CPU1: cpu@1 {
 			compatible = "arm,cortex-a9";
 			device_type = "cpu";
 			next-level-cache = <&L2>;
@@ -123,6 +123,181 @@
 		      <0x45000000 0x1000>;
 		interrupts = <GIC_SPI 9 IRQ_TYPE_LEVEL_HIGH>,
 			     <GIC_SPI 10 IRQ_TYPE_LEVEL_HIGH>;
+
+		ptm@5414c000 {
+			compatible = "arm,coresight-etm3x", "arm,primecell";
+			reg = <0x5414c000 0x1000>;
+			ti,hwmods = "l3_main_3", "l3_instr", "debugss";
+
+			clocks = <&trace_clk_div_ck>;
+			clock-names = "apb_pclk";
+			cpu = <&CPU0>;
+			port {
+				ptm0_out_port: endpoint {
+					remote-endpoint = <&mpu_funnel_in_port0>;
+				};
+			};
+		};
+
+		ptm@5414d000 {
+			compatible = "arm,coresight-etm3x", "arm,primecell";
+			reg = <0x5414d000 0x1000>;
+			ti,hwmods = "l3_main_3", "l3_instr", "debugss";
+
+			clocks = <&trace_clk_div_ck>;
+			clock-names = "apb_pclk";
+			cpu = <&CPU1>;
+			port {
+				ptm1_out_port: endpoint {
+					remote-endpoint = <&mpu_funnel_in_port1>;
+				};
+			};
+		};
+
+		funnel@54158000 {
+			compatible = "arm,coresight-funnel", "arm,primecell";
+			reg = <0x54158000 0x1000>;
+			ti,hwmods = "l3_main_3", "l3_instr", "debugss";
+
+			clocks = <&trace_clk_div_ck>;
+			clock-names = "apb_pclk";
+			ports {
+				#address-cells = <1>;
+				#size-cells = <0>;
+
+				/* funnel output ports */
+				port@0 {
+					reg = <0>;
+					mpu_funnel_out_port: endpoint {
+						remote-endpoint =
+							<&replicator_in_port>;
+					};
+				};
+
+				/* funnel input ports */
+				port@1 {
+					reg = <0>;
+					mpu_funnel_in_port0: endpoint {
+						slave-mode;
+						remote-endpoint = <&ptm0_out_port>;
+					};
+				};
+
+				port@2 {
+					reg = <1>;
+					mpu_funnel_in_port1: endpoint {
+						slave-mode;
+						remote-endpoint = <&ptm1_out_port>;
+					};
+				};
+			};
+		};
+
+		replicator {
+			compatible = "arm,coresight-replicator";
+			clocks = <&trace_clk_div_ck>;
+			clock-names = "apb_pclk";
+			ti,hwmods = "l3_main_3", "l3_instr", "debugss";
+
+			ports {
+				#address-cells = <1>;
+				#size-cells = <0>;
+
+				/* replicator output ports */
+				port@0 {
+					reg = <0>;
+					replicator_out_port0: endpoint {
+						remote-endpoint = <&tpiu_in_port>;
+					};
+				};
+				port@1 {
+					reg = <1>;
+					replicator_out_port1: endpoint {
+						remote-endpoint = <&dbg_funnel_in_port0>;
+					};
+				};
+
+				/* replicator input port */
+				port@2 {
+					reg = <0>;
+					replicator_in_port: endpoint {
+						slave-mode;
+						remote-endpoint = <&mpu_funnel_out_port>;
+					};
+				};
+			};
+		};
+
+		funnel@54164000 {
+			compatible = "arm,coresight-funnel", "arm,primecell";
+			reg = <0x54164000 0x1000>;
+			ti,hwmods = "l3_main_3", "l3_instr", "debugss";
+
+			clocks = <&trace_clk_div_ck>;
+			clock-names = "apb_pclk";
+			ports {
+				#address-cells = <1>;
+				#size-cells = <0>;
+
+				/* funnel output ports */
+				port@0 {
+					reg = <0>;
+					dbg_funnel_out_port: endpoint {
+						remote-endpoint =
+							<&etb_in_port>;
+					};
+				};
+
+				/* funnel input ports */
+				port@1 {
+					reg = <0>;
+					dbg_funnel_in_port0: endpoint {
+						slave-mode;
+						remote-endpoint = <&replicator_out_port1>;
+					};
+				};
+
+				/*
+				port@2 {
+					reg = <1>;
+					dbg_funnel_in_port1: endpoint {
+						slave-mode;
+						remote-endpoint = <&ptm1_out_port>;
+					};
+				};
+				*/
+			};
+		};
+
+		etb@54162000 {
+			compatible = "arm,coresight-etb10", "arm,primecell";
+			reg = <0x54162000 0x1000>;
+			ti,hwmods = "l3_main_3", "l3_instr", "debugss";
+
+			clocks = <&trace_clk_div_ck>;
+			clock-names = "apb_pclk";
+			port {
+				etb_in_port: endpoint {
+					slave-mode;
+					remote-endpoint = <&dbg_funnel_out_port>;
+				};
+			};
+		};
+
+		tpiu@54163000 {
+			compatible = "arm,coresight-tpiu", "arm,primecell";
+			reg = <0x54163000 0x1000>;
+			ti,hwmods = "l3_main_3", "l3_instr", "debugss";
+
+			clocks = <&trace_clk_div_ck>;
+			clock-names = "apb_pclk";
+			port {
+				tpiu_in_port: endpoint {
+					slave-mode;
+					remote-endpoint = <&replicator_out_port0>;
+				};
+			};
+		};
 
 		l4_cfg: l4@4a000000 {
 			compatible = "ti,omap4-l4-cfg", "simple-bus";

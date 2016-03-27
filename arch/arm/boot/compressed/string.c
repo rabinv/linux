@@ -120,9 +120,7 @@ char *strchr(const char *s, int c)
 	return (char *)s;
 }
 
-#undef memset
-
-void *memset(void *s, int c, size_t count)
+void *__memset(void *s, int c, size_t count)
 {
 	char *xs = s;
 	while (count--)
@@ -132,5 +130,5 @@ void *memset(void *s, int c, size_t count)
 
 void __memzero(void *s, size_t count)
 {
-	memset(s, 0, count);
+	__memset(s, 0, count);
 }

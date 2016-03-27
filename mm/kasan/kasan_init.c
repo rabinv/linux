@@ -167,14 +167,18 @@ void __init kasan_populate_zero_shadow(const void *shadow_start,
 			 * architectures will switch to pgtable-nop4d.h.
 			 */
 #ifndef __ARCH_HAS_5LEVEL_HACK
-			pgd_populate(&init_mm, pgd, lm_alias(kasan_zero_p4d));
+			if (pgd_none(*pgd))
+				pgd_populate(&init_mm, pgd, lm_alias(kasan_zero_p4d));
 #endif
 			p4d = p4d_offset(pgd, addr);
-			p4d_populate(&init_mm, p4d, lm_alias(kasan_zero_pud));
+			if (p4d_none(*p4d))
+				p4d_populate(&init_mm, p4d, lm_alias(kasan_zero_pud));
 			pud = pud_offset(p4d, addr);
-			pud_populate(&init_mm, pud, lm_alias(kasan_zero_pmd));
+			if (pud_none(*pud))
+				pud_populate(&init_mm, pud, lm_alias(kasan_zero_pmd));
 			pmd = pmd_offset(pud, addr);
-			pmd_populate_kernel(&init_mm, pmd, lm_alias(kasan_zero_pte));
+			if (pmd_none(*pmd))
+				pmd_populate_kernel(&init_mm, pmd, lm_alias(kasan_zero_pte));
 			continue;
 		}
 

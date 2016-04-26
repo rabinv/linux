@@ -8,6 +8,7 @@
  * it under the terms of the GNU General Public License version 2 as
  * published by the Free Software Foundation.
  */
+#define TRACE_MMIO_HELPERS
 #include <linux/module.h>
 #include <linux/moduleparam.h>
 #include <linux/init.h>
@@ -1021,10 +1022,10 @@ mmci_cmd_irq(struct mmci_host *host, struct mmc_command *cmd,
 	} else if (status & MCI_CMDCRCFAIL && cmd->flags & MMC_RSP_CRC) {
 		cmd->error = -EILSEQ;
 	} else {
-		cmd->resp[0] = readl(base + MMCIRESPONSE0);
-		cmd->resp[1] = readl(base + MMCIRESPONSE1);
-		cmd->resp[2] = readl(base + MMCIRESPONSE2);
-		cmd->resp[3] = readl(base + MMCIRESPONSE3);
+		cmd->resp[0] = readl_relaxed(base + MMCIRESPONSE0);
+		cmd->resp[1] = readl_relaxed(base + MMCIRESPONSE1);
+		cmd->resp[2] = readl_relaxed_notrace(base + MMCIRESPONSE2);
+		cmd->resp[3] = readl_relaxed(base + MMCIRESPONSE3);
 	}
 
 	if ((!sbc && !cmd->data) || cmd->error) {

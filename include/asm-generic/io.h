@@ -699,6 +699,10 @@ static inline void iowrite32_rep(volatile void __iomem *addr,
 #endif
 #endif /* CONFIG_GENERIC_IOMAP */
 
+#ifdef TRACE_MMIO_HELPERS
+#include <linux/trace_mmio_helpers.h>
+#endif
+
 #ifdef __KERNEL__
 
 #include <linux/vmalloc.h>

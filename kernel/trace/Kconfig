@@ -372,6 +372,21 @@ config STACK_TRACER
 
 	  Say N if unsure.
 
+config TRACE_MMIO_HELPERS
+       bool "Support for tracing MMIO helpers"
+       help
+	  Provide support for overriding the MMIO access helpers readl/writel
+	  (and their variants) with an implementation which embeds trace
+	  points.
+
+	  Simply enabling this configuration option will not enable any
+	  invocations of these trace points.  These tracepoints are only
+	  intended to be used while developing or debugging device drivers and
+	  must be explicitly adding a "#define TRACE_MMIO_HELPERS" line at the
+	  top of the driver's source file(s).
+
+	  If unsure, say N.
+
 config BLK_DEV_IO_TRACE
 	bool "Support for tracing block IO actions"
 	depends on SYSFS

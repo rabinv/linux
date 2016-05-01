@@ -6,6 +6,7 @@
 #
 
 GCOV_PROFILE	:= n
+KASAN_SANITIZE	:= n
 
 LDFLAGS_bootp	:=-p --no-undefined -X \
 		 --defsym initrd_phys=$(INITRD_PHYS) \

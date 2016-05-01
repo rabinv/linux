@@ -23,6 +23,7 @@
 #define __ARCH_USE_5LEVEL_HACK
 #include <asm-generic/pgtable-nopud.h>
 #include <asm/memory.h>
+#include <asm/kasan.h>
 #include <asm/pgtable-hwdef.h>
 
 
@@ -44,7 +45,7 @@
  */
 #define VMALLOC_OFFSET		(8*1024*1024)
 #define VMALLOC_START		(((unsigned long)high_memory + VMALLOC_OFFSET) & ~(VMALLOC_OFFSET-1))
-#define VMALLOC_END		0xff800000UL
+#define VMALLOC_END		(0xff800000UL - KASAN_SHADOW_SIZE)
 
 #define LIBRARY_TEXT_START	0x0c000000
 
@@ -97,6 +98,7 @@ extern pgprot_t		pgprot_s2_device;
 #define PAGE_READONLY		_MOD_PROT(pgprot_user, L_PTE_USER | L_PTE_RDONLY | L_PTE_XN)
 #define PAGE_READONLY_EXEC	_MOD_PROT(pgprot_user, L_PTE_USER | L_PTE_RDONLY)
 #define PAGE_KERNEL		_MOD_PROT(pgprot_kernel, L_PTE_XN)
+#define PAGE_KERNEL_RO		_MOD_PROT(pgprot_kernel, L_PTE_XN | L_PTE_RDONLY)
 #define PAGE_KERNEL_EXEC	pgprot_kernel
 #define PAGE_HYP		_MOD_PROT(pgprot_kernel, L_PTE_HYP | L_PTE_XN)
 #define PAGE_HYP_EXEC		_MOD_PROT(pgprot_kernel, L_PTE_HYP | L_PTE_RDONLY)

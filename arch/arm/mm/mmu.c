@@ -17,6 +17,7 @@
 #include <linux/fs.h>
 #include <linux/vmalloc.h>
 #include <linux/sizes.h>
+#include <linux/kasan.h>
 
 #include <asm/cp15.h>
 #include <asm/cputype.h>
@@ -1321,7 +1322,9 @@ static void __init devicemaps_init(const struct machine_desc *mdesc)
 	/*
 	 * Clear page table except top pmd used by early fixmaps
 	 */
-	for (addr = VMALLOC_START; addr < (FIXADDR_TOP & PMD_MASK); addr += PMD_SIZE)
+	for (addr = VMALLOC_START; addr < VMALLOC_END; addr += PMD_SIZE)
+		pmd_clear(pmd_off_k(addr));
+	for (addr = KASAN_SHADOW_END; addr < (FIXADDR_TOP & PMD_MASK); addr += PMD_SIZE)
 		pmd_clear(pmd_off_k(addr));
 
 	/*
@@ -1622,6 +1625,7 @@ void __init paging_init(const struct machine_desc *mdesc)
 	memblock_set_current_limit(arm_lowmem_limit);
 	dma_contiguous_remap();
 	early_fixmap_shutdown();
+	kasan_init();
 	devicemaps_init(mdesc);
 	kmap_init();
 	tcm_init();

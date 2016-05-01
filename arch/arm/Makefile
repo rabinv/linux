@@ -269,6 +269,8 @@ endif
 endif
 endif
 
+KASAN_SHADOW_OFFSET := 0xdf800000
+
 export	TEXT_OFFSET GZFLAGS MMUEXT
 
 # Do we have FASTFPE?

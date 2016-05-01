@@ -2,6 +2,7 @@
 #include <linux/sched.h>
 #include <linux/sched/debug.h>
 #include <linux/stacktrace.h>
+#include <linux/kasan.h>
 
 #include <asm/stacktrace.h>
 #include <asm/traps.h>
@@ -48,6 +49,8 @@ int notrace unwind_frame(struct stackframe *frame)
 void notrace walk_stackframe(struct stackframe *frame,
 		     int (*fn)(struct stackframe *, void *), void *data)
 {
+	kasan_disable_current();
+
 	while (1) {
 		int ret;
 
@@ -57,6 +60,8 @@ void notrace walk_stackframe(struct stackframe *frame,
 		if (ret < 0)
 			break;
 	}
+
+	kasan_enable_current();
 }
 EXPORT_SYMBOL(walk_stackframe);
 

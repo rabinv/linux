@@ -69,6 +69,12 @@
 #define MODULES_END		(PAGE_OFFSET)
 #endif
 
+#ifdef CONFIG_KASAN
+#define KASAN_SHADOW_SIZE	(SZ_512M)
+#else
+#define KASAN_SHADOW_SIZE	(0)
+#endif
+
 /*
  * The XIP kernel gets mapped at the bottom of the module vm area.
  * Since we use sections to map it, this macro replaces the physical address

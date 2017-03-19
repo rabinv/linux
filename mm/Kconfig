@@ -112,6 +112,10 @@ config SPARSEMEM_EXTREME
 	def_bool y
 	depends on SPARSEMEM && !SPARSEMEM_STATIC
 
+config VMEMMAP
+	bool
+	default y if SPARSEMEM_VMEMMAP
+
 config SPARSEMEM_VMEMMAP_ENABLE
 	bool
 

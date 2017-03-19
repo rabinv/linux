@@ -264,6 +264,7 @@ int __meminit vmemmap_populate_basepages(unsigned long start,
 	return 0;
 }
 
+#ifdef CONFIG_SPARSEMEM_VMEMMAP
 struct page * __meminit sparse_mem_map_populate(unsigned long pnum, int nid)
 {
 	unsigned long start;
@@ -321,3 +322,4 @@ void __init sparse_mem_maps_populate_node(struct page **map_map,
 		vmemmap_buf_end = NULL;
 	}
 }
+#endif

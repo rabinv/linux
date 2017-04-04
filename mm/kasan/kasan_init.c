@@ -39,7 +39,7 @@ pud_t kasan_zero_pud[PTRS_PER_PUD] __page_aligned_bss;
 #if CONFIG_PGTABLE_LEVELS > 2
 pmd_t kasan_zero_pmd[PTRS_PER_PMD] __page_aligned_bss;
 #endif
-pte_t kasan_zero_pte[PTRS_PER_PTE] __page_aligned_bss;
+pte_t kasan_zero_pte[KASAN_NUM_ZERO_PTES] __page_aligned_bss;
 
 static __init void *early_alloc(size_t size, int node)
 {

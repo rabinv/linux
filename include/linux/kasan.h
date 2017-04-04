@@ -15,8 +15,12 @@ struct task_struct;
 #include <asm/kasan.h>
 #include <asm/pgtable.h>
 
+#ifndef KASAN_NUM_ZERO_PTES
+#define KASAN_NUM_ZERO_PTES PTRS_PER_PTE
+#endif
+
 extern unsigned char kasan_zero_page[PAGE_SIZE];
-extern pte_t kasan_zero_pte[PTRS_PER_PTE];
+extern pte_t kasan_zero_pte[KASAN_NUM_ZERO_PTES];
 extern pmd_t kasan_zero_pmd[PTRS_PER_PMD];
 extern pud_t kasan_zero_pud[PTRS_PER_PUD];
 extern p4d_t kasan_zero_p4d[PTRS_PER_P4D];
